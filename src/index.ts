@@ -26,13 +26,12 @@ const main = async () => {
       name: 'gql-api',
       resave: false,
       saveUninitialized: false,
-      proxy: true,
+      proxy: isProd(),
       cookie: {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         secure: isProd(),
         sameSite: 'lax',
-        domain: '.apollographql.com',
       },
     }),
   );
