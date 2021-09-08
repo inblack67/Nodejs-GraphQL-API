@@ -17,8 +17,10 @@ export const Mutation = mutationType({
           return new Error(NOT_AUTHENTICATED);
         }
         session.destroy((err) => {
-          console.log(`Error destroying session => `);
-          console.error(err);
+          if(err){
+            console.log(`Error destroying session => `);
+            console.error(err);
+          }
         });
         return true;
       },
