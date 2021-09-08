@@ -28,6 +28,9 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
+  GetMeType: { // root type
+    userId?: number | null; // Int
+  }
   Mutation: {};
   Query: {};
 }
@@ -43,21 +46,31 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
+  GetMeType: { // field return type
+    userId: number | null; // Int
+  }
   Mutation: { // field return type
     loginUser: boolean | null; // Boolean
+    logoutUser: boolean | null; // Boolean
     registerUser: boolean | null; // Boolean
   }
   Query: { // field return type
+    getMe: NexusGenRootTypes['GetMeType'] | null; // GetMeType
     hello: string | null; // String
   }
 }
 
 export interface NexusGenFieldTypeNames {
+  GetMeType: { // field return type name
+    userId: 'Int'
+  }
   Mutation: { // field return type name
     loginUser: 'Boolean'
+    logoutUser: 'Boolean'
     registerUser: 'Boolean'
   }
   Query: { // field return type name
+    getMe: 'GetMeType'
     hello: 'String'
   }
 }

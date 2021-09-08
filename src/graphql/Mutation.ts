@@ -1,10 +1,28 @@
 import { User } from '.prisma/client';
 import { mutationType, stringArg } from 'nexus';
+import {
+  ALREADY_TAKEN,
+  INVALID_CREDENTIALS,
+  NOT_AUTHENTICATED,
+  NOT_AUTHORIZED,
+} from '../constants';
 import { IMyContext } from '../interface';
-import { hashPassword, verifyPassword } from '../utils';
+import { hashPassword, isAuthenticated, verifyPassword } from '../utils';
 
 export const Mutation = mutationType({
   definition(t) {
+    t.boolean('logoutUser', {
+      resolve: (_, __, { session }: IMyContext) => {
+        if (!isAuthenticated(session)) {
+          return new Error(NOT_AUTHENTICATED);
+        }
+        session.destroy((err) => {
+          console.log(`Error destroying session => `);
+          console.error(err);
+        });
+        return true;
+      },
+    });
     t.boolean('loginUser', {
       args: {
         username: stringArg(),
@@ -16,6 +34,10 @@ export const Mutation = mutationType({
         { prisma, session }: IMyContext,
       ) => {
         try {
+          if (isAuthenticated(session)) {
+            return new Error(NOT_AUTHORIZED);
+          }
+
           const user = await prisma.user.findUnique({
             where: {
               username: userDetails.username,
@@ -23,7 +45,7 @@ export const Mutation = mutationType({
           });
 
           if (!user) {
-            return new Error('Invalid Credentials');
+            return new Error(INVALID_CREDENTIALS);
           }
 
           const isCorrect = await verifyPassword(
@@ -32,7 +54,7 @@ export const Mutation = mutationType({
           );
 
           if (!isCorrect) {
-            return new Error('Invalid Credentials');
+            return new Error(INVALID_CREDENTIALS);
           }
 
           session['userId'] = user.id;
@@ -40,12 +62,7 @@ export const Mutation = mutationType({
           return true;
         } catch (err) {
           const errorCaught = err as any;
-          if (errorCaught.code === 'P2002') {
-            const errorMessage = `${errorCaught.meta.target.toString()} already taken`;
-            return new Error(errorMessage);
-          } else {
-            return new Error(errorCaught.message);
-          }
+          return new Error(errorCaught.message);
         }
       },
     });
@@ -59,9 +76,13 @@ export const Mutation = mutationType({
       resolve: async (
         _,
         { ...userDetails }: Omit<User, 'id'>,
-        { prisma }: IMyContext,
+        { prisma, session }: IMyContext,
       ) => {
         try {
+          if (isAuthenticated(session)) {
+            return new Error(NOT_AUTHORIZED);
+          }
+
           const hashedPassword = await hashPassword(userDetails.password);
           await prisma.user.create({
             data: {
@@ -73,7 +94,7 @@ export const Mutation = mutationType({
         } catch (err) {
           const errorCaught = err as any;
           if (errorCaught.code === 'P2002') {
-            const errorMessage = `${errorCaught.meta.target.toString()} already taken`;
+            const errorMessage = `${errorCaught.meta.target.toString()} ${ALREADY_TAKEN}`;
             return new Error(errorMessage);
           } else {
             return new Error(errorCaught.message);
