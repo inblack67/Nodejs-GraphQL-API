@@ -7,12 +7,34 @@ type GetMeType {
 }
 
 type Mutation {
+  createPost(content: String, title: String): Boolean
+  deletePost(id: Int): Boolean
   loginUser(password: String, username: String): Boolean
   logoutUser: Boolean
   registerUser(email: String, name: String, password: String, username: String): Boolean
 }
 
+type PostType {
+  content: String
+  createdAt: Float
+  id: Int
+  title: String
+  user: UserType
+  userId: Int
+}
+
 type Query {
   getMe: GetMeType
   hello: String
+  posts: [PostType]
+}
+
+type UserType {
+  createdAt: Float
+  email: String
+  id: Int
+  name: String
+  password: String
+  posts: [PostType]
+  username: String
 }
