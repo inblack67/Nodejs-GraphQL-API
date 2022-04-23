@@ -85,6 +85,7 @@ export interface NexusGenFieldTypes {
     getMe: NexusGenRootTypes['GetMeType'] | null; // GetMeType
     hello: string | null; // String
     posts: Array<NexusGenRootTypes['PostType'] | null> | null; // [PostType]
+    users: Array<NexusGenRootTypes['UserType'] | null> | null; // [UserType]
   }
   UserType: { // field return type
     createdAt: number | null; // Float
@@ -120,6 +121,7 @@ export interface NexusGenFieldTypeNames {
     getMe: 'GetMeType'
     hello: 'String'
     posts: 'PostType'
+    users: 'UserType'
   }
   UserType: { // field return type name
     createdAt: 'Float'

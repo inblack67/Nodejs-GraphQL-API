@@ -4,6 +4,7 @@ import { IMyContext } from '../interface';
 import { isAuthenticated } from '../utils';
 import { GetMeType } from './GetMeType';
 import { PostType } from './PostType';
+import { UserType } from './UserType';
 
 export const Query = queryType({
   definition(t) {
@@ -30,8 +31,13 @@ export const Query = queryType({
           if (!isAuthenticated(session)) {
             return new Error(NOT_AUTHENTICATED);
           }
-          const posts = await prisma.post.findMany({
+          return await prisma.post.findMany({
             select: {
+              content: true,
+              createdAt: true,
+              id: true,
+              userId: true,
+              title: true,
               user: {
                 select: {
                   username: true,
@@ -40,7 +46,29 @@ export const Query = queryType({
               },
             },
           });
-          return posts;
+        } catch (err) {
+          console.error(err);
+          return new Error(INTERNAL_SERVER_ERROR);
+        }
+      },
+    });
+
+    t.list.field('users', {
+      type: UserType,
+      resolve: async (_, __, { prisma, session }: IMyContext) => {
+        try {
+          if (!isAuthenticated(session)) {
+            return new Error(NOT_AUTHENTICATED);
+          }
+          return await prisma.user.findMany({
+            select: {
+              email: true,
+              id: true,
+              createdAt: true,
+              username: true,
+              name: true,
+            },
+          });
         } catch (err) {
           console.error(err);
           return new Error(INTERNAL_SERVER_ERROR);

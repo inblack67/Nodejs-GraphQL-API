@@ -27,6 +27,7 @@ type Query {
   getMe: GetMeType
   hello: String
   posts: [PostType]
+  users: [UserType]
 }
 
 type UserType {
