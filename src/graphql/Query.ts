@@ -1,37 +1,42 @@
-import { queryType } from 'nexus';
-import { INTERNAL_SERVER_ERROR, NOT_AUTHENTICATED } from '../constants';
-import { IMyContext } from '../interface';
+import { intArg, queryType } from 'nexus';
+import { INTERNAL_SERVER_ERROR, NOT_AUTHENTICATED, ROWS_LIMIT } from '../constants';
+import { ICursor, IMyContext } from '../interface';
 import { isAuthenticated } from '../utils';
 import { GetMeType } from './GetMeType';
 import { PostType } from './PostType';
 import { UserType } from './UserType';
 
-export const Query = queryType({
-  definition(t) {
-    t.field('hello', {
+export const Query = queryType( {
+  definition( t ) {
+    t.field( 'hello', {
       type: 'String',
       resolve: () => 'worlds',
-    });
-    t.field('getMe', {
+    } );
+    t.field( 'getMe', {
       type: GetMeType,
-      resolve: (_, __, { session }: IMyContext) => {
-        if (!isAuthenticated(session)) {
-          return new Error(NOT_AUTHENTICATED);
+      resolve: ( _, __, { session }: IMyContext ) => {
+        if ( !isAuthenticated( session ) ) {
+          return new Error( NOT_AUTHENTICATED );
         }
         return {
           userId: session.userId,
         };
       },
-    });
+    } );
 
-    t.list.field('posts', {
+    t.list.field( 'posts', {
       type: PostType,
-      resolve: async (_, __, { prisma, session }: IMyContext) => {
+      args: {
+        cursor: intArg()
+      },
+      resolve: async ( _, { cursor }: ICursor, { prisma, session }: IMyContext ) => {
         try {
-          if (!isAuthenticated(session)) {
-            return new Error(NOT_AUTHENTICATED);
+          if ( !isAuthenticated( session ) ) {
+            return new Error( NOT_AUTHENTICATED );
           }
-          return await prisma.post.findMany({
+          return await prisma.post.findMany( {
+            take: ROWS_LIMIT,
+            skip: cursor,
             select: {
               content: true,
               createdAt: true,
@@ -45,22 +50,22 @@ export const Query = queryType({
                 },
               },
             },
-          });
-        } catch (err) {
-          console.error(err);
-          return new Error(INTERNAL_SERVER_ERROR);
+          } );
+        } catch ( err ) {
+          console.error( err );
+          return new Error( INTERNAL_SERVER_ERROR );
         }
       },
-    });
+    } );
 
-    t.list.field('users', {
+    t.list.field( 'users', {
       type: UserType,
-      resolve: async (_, __, { prisma, session }: IMyContext) => {
+      resolve: async ( _, __, { prisma, session }: IMyContext ) => {
         try {
-          if (!isAuthenticated(session)) {
-            return new Error(NOT_AUTHENTICATED);
+          if ( !isAuthenticated( session ) ) {
+            return new Error( NOT_AUTHENTICATED );
           }
-          return await prisma.user.findMany({
+          return await prisma.user.findMany( {
             select: {
               email: true,
               id: true,
@@ -68,12 +73,12 @@ export const Query = queryType({
               username: true,
               name: true,
             },
-          });
-        } catch (err) {
-          console.error(err);
-          return new Error(INTERNAL_SERVER_ERROR);
+          } );
+        } catch ( err ) {
+          console.error( err );
+          return new Error( INTERNAL_SERVER_ERROR );
         }
       },
-    });
+    } );
   },
-});
+} );

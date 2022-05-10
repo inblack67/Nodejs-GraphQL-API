@@ -154,6 +154,11 @@ export interface NexusGenArgTypes {
       username?: string | null; // String
     }
   }
+  Query: {
+    posts: { // args
+      cursor?: number | null; // Int
+    }
+  }
 }
 
 export interface NexusGenAbstractTypeMembers {

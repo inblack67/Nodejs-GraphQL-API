@@ -26,7 +26,7 @@ type PostType {
 type Query {
   getMe: GetMeType
   hello: String
-  posts: [PostType]
+  posts(cursor: Int): [PostType]
   users: [UserType]
 }
 

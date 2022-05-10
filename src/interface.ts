@@ -14,3 +14,7 @@ export interface IMyContext {
   session: ISession;
   redis: Redis;
 }
+
+export interface ICursor {
+  cursor?: number;
+}
