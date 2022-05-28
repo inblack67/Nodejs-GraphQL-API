@@ -1,10 +1,11 @@
-### Node.js GraphQL API
+### Session based authentication in Node.js, TypeScript & GraphQL
 
-#### Users & Posts 
+### Features
 
-- Queries
-- Mutations
-- Subscriptions
+- Register User with Password hashing
+- Login User
+- Logout User
+- Get Authenticated User
 
 ### Tech Stack
 
@@ -14,4 +15,3 @@
   - Prisma
 - GraphQL
   - Nexus Schema
-
