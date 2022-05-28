@@ -13,5 +13,6 @@
 - Node.js & Express
 - PostgreSQL
   - Prisma
+- Redis
 - GraphQL
   - Nexus Schema
